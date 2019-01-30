@@ -7,14 +7,43 @@
 //
 
 import UIKit
-
-class PhotosViewController: UIViewController {
+import AlamofireImage
+class PhotosViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return posts.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "PhotoCell") as! PhotoCell
+        let post = posts[indexPath.row]
+        
+        if let photos = post["photos"] as? [[String: Any]] {
+            let photo = photos[0]
+            // 2.
+            let originalSize = photo["original_size"] as! [String: Any]
+            // 3.
+            let urlString = originalSize["url"] as! String
+            // 4.
+            let url = URL(string: urlString)
+            
+            cell.tumblrimageView.af_setImage(withURL: url!)
+        }
+        
+        return cell
+    }
     
     var posts: [[String: Any]] = []
+    @IBOutlet weak var PostView: UITableView!
+    @IBOutlet weak var PhotoCell: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        PostView.delegate = self
+        PostView.dataSource = self
+        
+       
         // Network request snippet
         let url = URL(string: "https://api.tumblr.com/v2/blog/humansofnewyork.tumblr.com/posts/photo?api_key=Q6vHoaVm5L1u2ZAW1fqv3Jw48gFzYVg9P0vH0VHl3GVy6quoGV")!
         let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
@@ -33,13 +62,15 @@ class PhotosViewController: UIViewController {
                 self.posts = responseDictionary["posts"] as! [[String: Any]]
                 
                 // TODO: Reload the table view
+                self.PostView.reloadData()
             }
         }
         task.resume()
-        
+       
     }
     
-
+   
+    
     /*
     // MARK: - Navigation
 
