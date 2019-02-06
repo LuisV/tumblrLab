@@ -10,30 +10,6 @@ import UIKit
 import AlamofireImage
 class PhotosViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return posts.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "PhotoCell") as! PhotoCell
-        let post = posts[indexPath.row]
-        
-        if let photos = post["photos"] as? [[String: Any]] {
-            let photo = photos[0]
-            // 2.
-            let originalSize = photo["original_size"] as! [String: Any]
-            // 3.
-            let urlString = originalSize["url"] as! String
-            // 4.
-            let url = URL(string: urlString)
-            
-            cell.tumblrimageView.af_setImage(withURL: url!)
-        }
-        
-        return cell
-    }
-    
     var posts: [[String: Any]] = []
     @IBOutlet weak var PostView: UITableView!
     @IBOutlet weak var PhotoCell: UITableView!
@@ -69,16 +45,45 @@ class PhotosViewController: UIViewController, UITableViewDataSource, UITableView
        
     }
     
-   
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return posts.count
+    }
     
-    /*
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "PhotoCell") as! PhotoCell
+        let post = posts[indexPath.row]
+        
+        if let photos = post["photos"] as? [[String: Any]] {
+            let photo = photos[0]
+            // 2.
+            let originalSize = photo["original_size"] as! [String: Any]
+            // 3.
+            let urlString = originalSize["url"] as! String
+            // 4.
+            let url = URL(string: urlString)
+            
+            cell.tumblrimageView.af_setImage(withURL: url!)
+        }
+        
+        return cell
+    }
+
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        
+        
+        let detailsViewController = segue.destination as! PhotoDetailsViewController
+        
+        let cell = sender as! PhotoCell
+        let indexPath = PostView.indexPath(for: cell)!
+        detailsViewController.image = cell.tumblrimageView.image
+        
+        
+        PostView.deselectRow(at: indexPath, animated: true)
     }
-    */
+    
 
 }
